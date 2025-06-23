@@ -25,7 +25,7 @@ A simple, anonymous chat web app with end-to-end AES-GCM encryption, powered by:
 Clone the repo:
 
 bash
-  git clone https://github.com/<your-username>/cyphertalk.git
+  git clone https://github.com/vineet1603/CypherTalk.git
   cd cyphertalk
   
 Install dependencies:
