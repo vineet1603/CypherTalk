@@ -1,0 +1,40 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #101820;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+.container {
+    width: 400px;
+    padding: 20px;
+    background: #1a1a2e;
+    border-radius: 8px;
+}
+#messages {
+    height: 300px;
+    overflow-y: scroll;
+    background: #0f3460;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 4px;
+}
+input {
+    width: 70%;
+    padding: 10px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 4px;
+}
+button {
+    width: 25%;
+    padding: 10px;
+    background: #e94560;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CypherTalk</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h2>CypherTalk - Anonymous Chat</h2>
+
+    <!-- Home Screen -->
+    <div id="home">
+      <input id="room" placeholder="Enter or Create Room Code" />
+      <button onclick="generateRoomCode()">Generate Room</button>
+      <button onclick="joinRoom()">Join Room</button>
+    </div>
+
+    <!-- Chat Screen -->
+    <div id="chat" style="display:none">
+      <p>Room Code: <span id="roomLabel"></span>
+        <button onclick="copyRoomLink()" style="margin-left: 10px;">📋 Copy Link</button>
+      </p>
+      <div id="messages"></div>
+      <input id="messageInput" placeholder="Enter message" />
+      <button onclick="sendMessage()">Send</button>
+      <button onclick="exitRoom()" style="background-color:#555;">Exit</button>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
