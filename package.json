@@ -8,9 +8,18 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "express": "^5.1.0",
     "socket.io": "^4.8.1"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vineet1603/cyphertalk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/vineet1603/cyphertalk/issues"
+  },
+  "homepage": "https://github.com/vineet1603/cyphertalk#readme",
+  "devDependencies": {},
+  "description": ""
 }
