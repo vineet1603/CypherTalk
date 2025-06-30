@@ -1,34 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>CypherTalk</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>CypherTalk - Anonymous Chat</title>
+  <link rel="stylesheet" href="base.css" />
+  <link rel="stylesheet" href="demo2.css" />
+  <style>
+    #chat, #home {
+      background-color: rgba(0, 0, 0, 0.7);
+      padding: 20px;
+      border-radius: 12px;
+      z-index: 1001;
+      position: relative;
+    }
+    #messages {
+      background: #222;
+      padding: 10px;
+      height: 200px;
+      overflow-y: auto;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      color: #eee;
+    }
+    input, button {
+      margin: 5px;
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+    }
+    button {
+      background-color: #e94560;
+      color: white;
+      cursor: pointer;
+    }
+    .light-mode {
+      background-color: #f5f5f5 !important;
+      color: #000 !important;
+    }
+    .light-mode #chat, .light-mode #home {
+      background-color: rgba(255,255,255,0.85);
+    }
+    .light-mode #messages {
+      background-color: #eee;
+      color: #111;
+    }
+  </style>
 </head>
-<body>
-  <div class="container">
-    <h2>CypherTalk - Anonymous Chat</h2>
-
-    <!-- Home Screen -->
-    <div id="home">
-      <input id="room" placeholder="Enter or Create Room Code" />
-      <button onclick="generateRoomCode()">Generate Room</button>
-      <button onclick="joinRoom()">Join Room</button>
+<body class="demo-2">
+  <main>
+    <div class="frame">
+      <div class="frame__title-wrap">
+        <h1 class="frame__title">Welcome to CypherTalk</h1>
+      </div>
     </div>
-
-    <!-- Chat Screen -->
-    <div id="chat" style="display:none">
-      <p>Room Code: <span id="roomLabel"></span>
-        <button onclick="copyRoomLink()" style="margin-left: 10px;">📋 Copy Link</button>
-      </p>
-      <div id="messages"></div>
-      <input id="messageInput" placeholder="Enter message" />
-      <button onclick="sendMessage()">Send</button>
-      <button onclick="exitRoom()" style="background-color:#555;">Exit</button>
+    <div class="content content--canvas">
+      <div id="home">
+        <input id="username" placeholder="Enter your name (optional)" />
+        <input id="room" placeholder="Enter or Create Room Code" />
+        <button onclick="generateRoomCode()">Generate Room</button>
+        <button onclick="joinRoom()">Join Room</button>
+      </div>
+      <div id="chat" style="display:none">
+        <p>Room Code: <span id="roomLabel"></span>
+          <button onclick="copyRoomLink()">📋 Copy Link</button>
+        </p>
+        <div id="messages"></div>
+        <input id="messageInput" placeholder="Enter message" />
+        <button onclick="sendMessage()">Send</button>
+        <button onclick="exitRoom()" style="background-color:#555;">Exit</button>
+      </div>
     </div>
-  </div>
-
+  </main>
+  <button id="themeToggle" style="position: fixed; top: 20px; right: 20px; z-index: 2000;">Toggle Theme</button>
   <script src="/socket.io/socket.io.js"></script>
   <script src="script.js"></script>
+  <script src="swirl.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/simplex-noise@4.0.1/simplex-noise.min.js"></script>
+  <script>
+    const toggleBtn = document.getElementById("themeToggle");
+    toggleBtn.addEventListener("click", () => {
+      document.body.classList.toggle("light-mode");
+    });
+  </script>
+  <script src="swirl.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/simplex-noise@4.0.1/simplex-noise.min.js"></script>
 </body>
 </html>
