@@ -3,15 +3,6 @@ let currentRoom = '';
 let key = null;
 
 
-window.onload = () => {
-  const params = new URLSearchParams(window.location.search);
-  const room = params.get("room");
-  if (room) {
-    document.getElementById("room").value = room;
-    joinRoom();
-  }
-};
-
 function generateRoomCode() {
   const code = Math.random().toString(36).substring(2, 8).toUpperCase();
   document.getElementById("room").value = code;
