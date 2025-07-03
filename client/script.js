@@ -2,6 +2,7 @@ const socket = io();
 let currentRoom = '';
 let key = null;
 
+
 window.onload = () => {
   const params = new URLSearchParams(window.location.search);
   const room = params.get("room");

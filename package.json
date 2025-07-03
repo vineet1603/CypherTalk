@@ -1,24 +1,12 @@
 {
-  "name": "cyphertalk-app",
+  "name": "cyphertalk",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "server/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server/index.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
-    "express": "^5.1.0",
-    "socket.io": "^4.8.1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/vineet1603/cyphertalk.git"
-  },
-  "bugs": {
-    "url": "https://github.com/vineet1603/cyphertalk/issues"
-  },
-  "homepage": "https://github.com/vineet1603/cyphertalk#readme",
-  "description": ""
+    "express": "^4.18.2",
+    "socket.io": "^4.7.2"
+  }
 }
