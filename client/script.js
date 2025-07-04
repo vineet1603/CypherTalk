@@ -1,95 +1,94 @@
 const socket = io();
-let currentRoom = '';
-let key = null;
+let room = "";
+let username = "";
 
-
-function generateRoomCode() {
-  const code = Math.random().toString(36).substring(2, 8).toUpperCase();
-  document.getElementById("room").value = code;
-}
-
-async function generateKey() {
-  const enc = new TextEncoder();
-  const roomBytes = enc.encode(currentRoom.padEnd(16, '0').slice(0, 16)); // 128-bit key from room
-  key = await window.crypto.subtle.importKey(
-    "raw",
-    roomBytes,
-    { name: "AES-GCM" },
-    false,
-    ["encrypt", "decrypt"]
-  );
-}
-
-function joinRoom() {
-  const room = document.getElementById("room").value.trim();
-  if (!room) return alert("Enter a room code");
-
-  currentRoom = room;
-  document.getElementById("roomLabel").textContent = room;
-  document.getElementById("home").style.display = "none";
-  document.getElementById("chat").style.display = "block";
-
-  socket.emit("joinRoom", room);
-  generateKey();
-}
-
-function exitRoom() {
-  location.href = "/";
-}
-
-function copyRoomLink() {
-  const link = `${location.origin}?room=${currentRoom}`;
-  navigator.clipboard.writeText(link).then(() => {
-    alert("Room link copied!");
-  }).catch(err => {
-    alert("Failed to copy link.");
-  });
-}
-
-async function sendMessage() {
-  const input = document.getElementById("messageInput");
-  const message = input.value;
-  if (!message) return;
-
-  const iv = window.crypto.getRandomValues(new Uint8Array(12));
-  const enc = new TextEncoder();
-  const encrypted = await window.crypto.subtle.encrypt(
-    { name: "AES-GCM", iv: iv },
-    key,
-    enc.encode(message)
-  );
-
-  const payload = {
-    iv: Array.from(iv),
-    data: Array.from(new Uint8Array(encrypted))
-  };
-
-  socket.emit("sendMessage", { room: currentRoom, message: payload });
-  appendMessage(`You: ${message}`);
-  input.value = '';
-}
-
-socket.on("receiveMessage", async (payload) => {
-  const iv = new Uint8Array(payload.iv);
-  const data = new Uint8Array(payload.data);
-
-  try {
-    const decrypted = await window.crypto.subtle.decrypt(
-      { name: "AES-GCM", iv: iv },
-      key,
-      data
-    );
-    const dec = new TextDecoder();
-    appendMessage(`Stranger: ${dec.decode(decrypted)}`);
-  } catch (e) {
-    appendMessage("[Error decrypting message]");
+document.getElementById("messageInput").addEventListener("keydown", function (e) {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
   }
 });
 
-function appendMessage(msg) {
-  const box = document.getElementById("messages");
+function generateRoomCode() {
+  const code = Math.random().toString(36).substr(2, 6).toUpperCase();
+  document.getElementById("room").value = code;
+}
+
+function joinRoom() {
+  room = document.getElementById("room").value.trim();
+  username = document.getElementById("username").value.trim() || "Anonymous";
+
+  if (!room) {
+    alert("Please enter a room code.");
+    return;
+  }
+
+  document.getElementById("home").style.display = "none";
+  document.getElementById("chat").style.display = "block";
+  document.getElementById("roomLabel").innerText = room;
+
+  socket.emit("joinRoom", { room, username });
+}
+
+function sendMessage() {
+  const input = document.getElementById("messageInput");
+  const message = input.value.trim();
+  if (message) {
+    displayMessage({ username: "You", message, self: true });
+    socket.emit("sendMessage", { room, message, username });
+    input.value = "";
+  }
+}
+
+function exitRoom() {
+  socket.emit("leaveRoom", { room, username });
+  document.getElementById("chat").style.display = "none";
+  document.getElementById("home").style.display = "block";
+}
+
+function copyRoomLink() {
+  const url = `${window.location.origin}?room=${room}`;
+  navigator.clipboard.writeText(url);
+  alert("Room link copied!");
+}
+
+function displayMessage({ username, message, self = false, system = false }) {
+  const msgBox = document.getElementById("messages");
   const div = document.createElement("div");
-  div.textContent = msg;
-  box.appendChild(div);
-  box.scrollTop = box.scrollHeight;
+  div.style.padding = "8px";
+  div.style.margin = "5px 0";
+  div.style.borderRadius = "8px";
+  div.style.whiteSpace = "pre-wrap";
+
+  if (system) {
+    div.style.background = "#ffeaa7";
+    div.style.color = "#2d3436";
+    div.innerText = message;
+  } else {
+    div.style.background = "transparent";
+    div.style.textAlign = self ? "right" : "left";
+    div.innerHTML = self ? `<b>${username}:</b><br>${message}` : `<b>${username}:</b><br>${message}`;
+  }
+
+  msgBox.appendChild(div);
+  msgBox.scrollTop = msgBox.scrollHeight;
+}
+
+socket.on("receiveMessage", (data) => {
+  displayMessage({ username: data.username, message: data.message });
+});
+
+socket.on("userJoined", (data) => {
+  displayMessage({ message: `${data.username} joined the chat.`, system: true });
+  updateUserCount(data.count);
+});
+
+socket.on("userLeft", (data) => {
+  displayMessage({ message: `${data.username} left the chat.`, system: true });
+  updateUserCount(data.count);
+});
+
+function updateUserCount(count) {
+  let label = document.getElementById("roomLabel");
+  label.innerText = `${room} (${count} online)`;
 }
