@@ -2,130 +2,106 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>CypherTalk - Anonymous Chat</title>
-  <link rel="stylesheet" href="base.css" />
-  <link rel="stylesheet" href="ani.css" />
+  <title>CypherTalk - Secure Anonymous Chat</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    #chat, #home {
-      background-color: rgba(0, 0, 0, 0.7);
-      padding: 20px;
-      border-radius: 12px;
-      z-index: 1001;
-      position: relative;
-    }
-    #messages {
-      background: #222;
-      padding: 10px;
-      height: 200px;
-      overflow-y: auto;
-      border-radius: 6px;
-      margin-bottom: 10px;
-      color: #eee;
-    }
-    input, button {
-      margin: 5px;
-      padding: 10px;
-      border-radius: 6px;
-      border: none;
-    }
-    button {
-      background-color: #e94560;
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
       color: white;
-      cursor: pointer;
+      overflow: hidden;
     }
-    .light-mode {
-      background-color: #f5f5f5 !important;
-      color: #000 !important;
+    #particles-js {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
     }
-    .light-mode #chat, .light-mode #home {
-      background-color: rgba(255,255,255,0.85);
+    .bg-bubbles {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
     }
-    .light-mode #messages {
-      background-color: #eee;
-      color: #111;
+    .bg-bubbles li {
+      position: absolute;
+      list-style: none;
+      display: block;
+      width: 40px;
+      height: 40px;
+      background: rgba(255, 255, 255, 0.15);
+      bottom: -160px;
+      animation: square 25s infinite linear;
+      border-radius: 10px;
+    }
+    @keyframes square {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(-1000px) rotate(720deg); opacity: 0; }
     }
   </style>
 </head>
-<body class="demo-2">
-  <main>
-    <div> id="loading-screen"><div class="scene">
-	<div class="person">
-		<div class="person__rightarm"></div>
-		<div class="person__body">
-			<div></div>
-			<div></div>
-			<div></div>
-		</div>
-		<div class="person__head">
-			<div class="person__hair"></div>
-			<div class="person__face2">
-				<div></div>
-				<div class="person__nose"></div>
-				<div class="person__mouth"></div>
-				<div class="person__lefteye"></div>
-				<div class="person__leftbrow"></div>
-				<div class="person__forelock"></div>
-				<div class="person__glasses2"></div>
-			</div>
-			<div class="person__face1">
-				<div></div>
-				<div class="person__nose"></div>
-				<div class="person__mouth"></div>
-				<div class="person__righteye"></div>
-				<div class="person__lefteye"></div>
-				<div class="person__leftbrow"></div>
-				<div class="person__rightbrow"></div>
-				<div class="person__forelock"></div>
-			</div>
-			<div class="person__glasses1"></div>
-		</div>
-		<div class="person__lefttarm"></div>
-		<div class="person__helmet"></div>
-	</div>
-</div>
-    <div class="frame">
-      <div class="frame__title-wrap">
-        <h1 class="frame__title">Welcome to CypherTalk</h1>
+<body>
+  <!-- Background Effects -->
+  <div id="particles-js"></div>
+  <ul class="bg-bubbles">
+    <li></li><li></li><li></li><li></li><li></li>
+    <li></li><li></li><li></li><li></li><li></li>
+  </ul>
+
+  <!-- App Container -->
+  <div class="container" style="position: relative; z-index: 1; max-width: 600px; margin: 30vh auto; background: rgba(255,255,255,0.05); padding: 35px; border-radius: 20px;">
+    <div id="home">
+      <h2 style="text-align:center;">Welcome to CypherTalk</h2>
+      <p style="text-align:center;">Secure, encrypted and anonymous chat</p>
+      <input id="username" placeholder="Enter your name (optional)" style="width: 97%; padding: 9px; border-radius: 8px; margin-top: 15px;" />
+      <input id="room" placeholder="Enter or Create Room Code" style="width: 97%; padding: 10px; border-radius: 8px; margin-top: 10px;" />
+      <div style="display:flex; gap:10px; margin-top: 15px;">
+        <button onclick="generateRoomCode()" style="flex:1; padding:10px; background:#00cec9; color:#000; border:none; border-radius:8px;">Generate</button>
+        <button onclick="joinRoom()" style="flex:1; padding:10px; background:#6c5ce7; color:#fff; border:none; border-radius:8px;">Join</button>
       </div>
     </div>
-    <div class="content content--canvas">
-      <div id="home">
-        <input id="username" placeholder="Enter your name (optional)" />
-        <input id="room" placeholder="Enter or Create Room Code" />
-        <button onclick="generateRoomCode()">Generate Room</button>
-        <button onclick="joinRoom()">Join Room</button>
-      </div>
-      <div id="chat" style="display:none">
-        <p>Room Code: <span id="roomLabel"></span>
-          <button onclick="copyRoomLink()">📋 Copy Link</button>
-        </p>
-        <div id="messages"></div>
-        <input id="messageInput" placeholder="Enter message" />
-        <button onclick="sendMessage()">Send</button>
-        <button onclick="exitRoom()" style="background-color:#555;">Exit</button>
-      </div>
+
+    <div id="chat" style="display:none; margin-top: 20px;">
+      <p>Room Code: <span id="roomLabel"></span> 
+        <button onclick="copyRoomLink()" style="margin-left: 10px;">📋 Copy Link</button>
+      </p>
+      <div id="messages" style="height: 200px; overflow-y: auto; background: rgba(0,0,0,0.2); padding: 5px; border-radius: 10px; margin-bottom: 10px;"></div>
+      <input id="messageInput" placeholder="Enter message" style="width: 96%; padding: 10px; border-radius: 8px;" />
+      <button onclick="sendMessage()" style="width: 100%; margin-top: 10px; padding: 10px; background: #00cec9; color: #000; border: none; border-radius: 8px;">Send</button>
+      <button onclick="exitRoom()" style="width: 100%; margin-top: 10px; padding: 10px; background: #d63031; color: #fff; border: none; border-radius: 8px;">Exit</button>
     </div>
-  </main>
-  <button id="themeToggle" style="position: fixed; top: 20px; right: 20px; z-index: 2000;">Toggle Theme</button>
+  </div>
+
+  <!-- Required Scripts -->
   <script src="/socket.io/socket.io.js"></script>
   <script src="script.js"></script>
-  <script src="swirl.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/simplex-noise@4.0.1/simplex-noise.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
   <script>
-    const toggleBtn = document.getElementById("themeToggle");
-    toggleBtn.addEventListener("click", () => {
-      document.body.classList.toggle("light-mode");
+    // Particle JS Init
+    particlesJS("particles-js", {
+      "particles": {
+        "number": { "value": 80, "density": { "enable": true, "value_area": 800 } },
+        "color": { "value": "#00cec9" },
+        "shape": { "type": "circle" },
+        "opacity": { "value": 0.5 },
+        "size": { "value": 3, "random": true },
+        "line_linked": { "enable": true, "distance": 150, "color": "#6c5ce7", "opacity": 0.4, "width": 1 },
+        "move": { "enable": true, "speed": 2 }
+      },
+      "interactivity": {
+        "events": {
+          "onhover": { "enable": true, "mode": "grab" },
+          "onclick": { "enable": true, "mode": "push" }
+        }
+      }
     });
   </script>
-  <script src="swirl.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/simplex-noise@4.0.1/simplex-noise.min.js"></script>
-<script>
-  window.addEventListener("load", () => {
-    setTimeout(() => {
-      document.getElementById("loading-screen").style.display = "none";
-    }, 2500);
-  });
-</script>
-
 </body>
 </html>
