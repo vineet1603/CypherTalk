@@ -21,6 +21,10 @@ A simple, anonymous chat web app with end-to-end AES-GCM encryption, powered by:
 
   🌍 Works globally when deployed
 
+  👌 Emoji reactions for messages
+    
+  ✅ Reply for preview messages
+
 ⚙️ Local Setup
 Clone the repo:
 
