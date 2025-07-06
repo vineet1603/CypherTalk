@@ -1,6 +1,7 @@
 const socket = io();
 let room = "";
 let username = "";
+let replyTo = null;
 
 document.getElementById("messageInput").addEventListener("keydown", function (e) {
   if (e.key === "Enter" && !e.shiftKey) {
@@ -34,9 +35,15 @@ function sendMessage() {
   const input = document.getElementById("messageInput");
   const message = input.value.trim();
   if (message) {
-    displayMessage({ username: "You", message, self: true });
-    socket.emit("sendMessage", { room, message, username });
+    const payload = { room, message, username };
+    if (replyTo) {
+      payload.reply = replyTo;
+    }
+    displayMessage({ username: "You", message, reply: replyTo, self: true });
+    socket.emit("sendMessage", payload);
     input.value = "";
+    replyTo = null;
+    document.getElementById("replyPreview").style.display = "none";
   }
 }
 
@@ -52,22 +59,63 @@ function copyRoomLink() {
   alert("Room link copied!");
 }
 
-function displayMessage({ username, message, self = false, system = false }) {
+function setReply(messageText) {
+  replyTo = messageText;
+  const preview = document.getElementById("replyPreview");
+  preview.innerHTML = `<small>Replying to:</small><br><i>"${messageText}"</i>`;
+  preview.style.display = "block";
+}
+
+function addEmoji(target, emoji) {
+  const current = target.querySelector(".emoji-bar");
+  if (!current.innerText.includes(emoji)) {
+    current.innerText += " " + emoji;
+  }
+}
+
+function displayMessage({ username, message, self = false, system = false, reply = null }) {
   const msgBox = document.getElementById("messages");
   const div = document.createElement("div");
   div.style.padding = "8px";
   div.style.margin = "5px 0";
   div.style.borderRadius = "8px";
   div.style.whiteSpace = "pre-wrap";
+  div.style.background = "transparent";
+  div.style.position = "relative";
 
   if (system) {
-    div.style.background = "#ffeaa7";
-    div.style.color = "#2d3436";
     div.innerText = message;
+    div.style.color = "#ffeb3b";
   } else {
-    div.style.background = "transparent";
-    div.style.textAlign = self ? "right" : "left";
-    div.innerHTML = self ? `<b>${username}:</b><br>${message}` : `<b>${username}:</b><br>${message}`;
+    div.innerHTML = reply ? `<small><i>In reply to:</i><br>"${reply}"</small><br>` : "";
+    div.innerHTML += `<b>${username}:</b><br>${message}`;
+
+    const tools = document.createElement("div");
+    tools.style.fontSize = "0.8em";
+    tools.style.marginTop = "4px";
+
+    const replyBtn = document.createElement("button");
+    replyBtn.innerText = "↩ Reply";
+    replyBtn.style.marginRight = "8px";
+    replyBtn.onclick = () => setReply(message);
+
+    const emojiBar = document.createElement("span");
+    emojiBar.className = "emoji-bar";
+    emojiBar.style.marginLeft = "10px";
+
+    const emojis = ["👍", "❤️", "😂"];
+    emojis.forEach(em => {
+      const btn = document.createElement("button");
+      btn.innerText = em;
+      btn.onclick = () => addEmoji(div, em);
+      btn.style.marginRight = "5px";
+      btn.style.cursor = "pointer";
+      tools.appendChild(btn);
+    });
+
+    tools.appendChild(replyBtn);
+    tools.appendChild(emojiBar);
+    div.appendChild(tools);
   }
 
   msgBox.appendChild(div);
@@ -75,7 +123,7 @@ function displayMessage({ username, message, self = false, system = false }) {
 }
 
 socket.on("receiveMessage", (data) => {
-  displayMessage({ username: data.username, message: data.message });
+  displayMessage({ username: data.username, message: data.message, reply: data.reply });
 });
 
 socket.on("userJoined", (data) => {
